@@ -18,15 +18,9 @@ DELETE FROM `creature_text` where `CreatureID` = 10076;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `BroadcastTextId`)
 VALUES (10076, 0, 0, "You will not harm Emperor Thaurissan!", 14, 0);
 
-
 -- ironhand guardians, add cpp script, remove smartAI and smartscripts
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'brd_ironhand_guardian' WHERE (`entry` = 8982);
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 8982) AND (`source_type` = 0) AND (`id` IN (0, 1));
-
--- magmus
-DELETE FROM `creature_text` WHERE `CreatureID` = 9938;
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `BroadcastTextId`)
-VALUES (9938, 0, 0, "Emperor Thaurissan does not wish to be disturbed! Turn back now or face your doom, weak mortals!", 14, 5430);
 
 -- flamekeepers 
 DELETE FROM `pool_template` WHERE `entry` = 1550;
