@@ -26,23 +26,11 @@ jobs:
           - os: ubuntu-20.04
             compiler: clang11
             modules: without
-          - os: ubuntu-18.04
-            compiler: clang10
-            modules: without
-          - os: ubuntu-18.04
-            compiler: gcc8
-            modules: without
-          - os: ubuntu-20.04
-            compiler: gcc # default in 20.04 is gcc 9
-            modules: without
-          - os: ubuntu-20.04
-            compiler: gcc10
-            modules: without
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
       COMPILER: ${{ matrix.compiler }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'patou01/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Checkout modules
