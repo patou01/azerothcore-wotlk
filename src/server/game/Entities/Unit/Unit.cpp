@@ -9689,7 +9689,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     //if (GetTypeId() == TYPEID_UNIT)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
 
-    if (creature && !IsControllableGuardian())
+     if (creature && IsControllableGuardian())
     {
         // should not let player enter combat by right clicking target - doesn't helps
         SetInCombatWith(victim);
@@ -9700,6 +9700,24 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         creature->SendAIReaction(AI_REACTION_HOSTILE);
         creature->CallAssistance();
         creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
+
+        if (Unit* Owner = GetOwner())
+        {
+            if (!Owner->IsInCombatWith(victim))
+            {
+                if (Creature* OwnerCreature = Owner->ToCreature())
+                {
+                    if (!OwnerCreature->IsInCombat())
+                    {
+                        Owner->GetAI()->AttackStart(victim);
+                    }
+                }
+                Owner->SetInCombatWith(victim);
+                if (victim->GetTypeId() == TYPEID_PLAYER)
+                    victim->SetInCombatWith(Owner);
+                Owner->AddThreat(victim, 0.0f);
+            }
+        }
     }
 
     // delay offhand weapon attack to next attack time
