@@ -70,12 +70,14 @@ public:
             _zigguratState2 = 0;
             _zigguratState3 = 0;
             _slaughterProgress = 0;
+            _slaughterEventStatus = 0;
             _slaughterNPCs = 0;
             _postboxesOpened = 0;
 
             _gateTrapsCooldown[0] = false;
             _gateTrapsCooldown[1] = false;
 
+            SlaughterAbominations.clear();
             events.Reset();
         }
 
@@ -95,6 +97,7 @@ public:
                     break;
                 case NPC_VENOM_BELCHER:
                 case NPC_BILE_SPEWER:
+                    SlaughterAbominations.push_back(creature->GetGUID());
                     if (_slaughterProgress == 0)
                         ++_slaughterNPCs;
                     break;
@@ -118,7 +121,7 @@ public:
             if (_slaughterProgress == 1)
             {
                 if (Creature* baron = instance->GetCreature(_baronRivendareGUID))
-                    baron->AI()->Talk(SAY_BRAON_SUMMON_RAMSTEIN);
+                    baron->AI()->Talk(SAY_BARON_SUMMON_RAMSTEIN);
 
                 Position pos = {4032.20f, -3378.06f, 119.75f, 4.67f};
                 instance->SummonCreature(NPC_RAMSTEIN_THE_GORGER, pos);
@@ -227,7 +230,7 @@ public:
             {
                 instance->LoadGrid(4035.83f, -3336.31f);
                 if (Creature* baron = instance->GetCreature(_baronRivendareGUID))
-                    baron->AI()->Talk(SAY_BRAON_ZIGGURAT_FALL_YELL);
+                    baron->AI()->Talk(SAY_BARON_ZIGGURAT_FALL_YELL);
 
                 if (GameObject* gate = instance->GetGameObject(_gauntletGateGUID))
                     gate->SetGoState(GO_STATE_ACTIVE);
@@ -316,6 +319,25 @@ public:
                 case TYPE_MALLOW:
                     ++_postboxesOpened;
                     break;
+                case TYPE_SLAUGHTER:
+                    switch (data)
+                    {
+                        case IN_PROGRESS:
+                            if (GameObject* gate = instance->GetGameObject(_slaughterGateGUID))
+                            {
+                                gate->SetGoState(GO_STATE_READY);
+                            }
+                            break;
+                        case FAIL:
+                            [[fallthrough]];
+                        case DONE:
+                            if (GameObject* gate = instance->GetGameObject(_slaughterGateGUID))
+                            {
+                                gate->SetGoState(GO_STATE_ACTIVE);
+                            }
+                            break;
+                    }
+                    break;
             }
 
             SaveToDB();
@@ -366,6 +388,8 @@ public:
                     return _zigguratState3;
                 case TYPE_MALLOW:
                     return _postboxesOpened;
+                case TYPE_SLAUGHTER:
+                    return _slaughterEventStatus;
             }
             return 0;
         }
@@ -373,6 +397,23 @@ public:
         void Update(uint32 diff) override
         {
             events.Update(diff);
+
+            // start slaughter event here
+            if (GetData(TYPE_ZIGGURAT3) == 2 && GetData(TYPE_ZIGGURAT2) == 2 && GetData(TYPE_ZIGGURAT1) == 2
+                && GetData(TYPE_SLAUGHTER) == NOT_STARTED)
+            {
+                for (const auto& aboGuid : SlaughterAbominations)
+                {
+                    if (Creature* abo = instance->GetCreature(aboGuid))
+                    {
+                        if (abo->IsInCombat())
+                        {
+                            SetData(TYPE_SLAUGHTER, IN_PROGRESS);
+                        }
+                    }
+                }
+            }
+
 
             Map::PlayerList const& players = instance->GetPlayers();
             // Loop over the two Gate traps, each one has up to three timers (trap reset, gate opening delay, critters spawning delay)
@@ -548,6 +589,7 @@ public:
         uint32 _slaughterProgress;
         uint32 _slaughterNPCs;
         uint32 _postboxesOpened;
+        uint32  _slaughterEventStatus;
         EventMap events;
 
         ObjectGuid _zigguratDoorsGUID1;
@@ -562,6 +604,8 @@ public:
         bool _gateTrapsCooldown[2];
         ObjectGuid _trappedPlayerGUID;
         ObjectGuid _trapGatesGUIDs[4];
+
+        std::vector<ObjectGuid> SlaughterAbominations;
 
         void gate_delay(int gate)
         {

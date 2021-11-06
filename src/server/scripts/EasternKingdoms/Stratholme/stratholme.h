@@ -30,6 +30,7 @@ enum DataTypes
     TYPE_ZIGGURAT3                      = 3,
     TYPE_BARON_FIGHT                    = 4,
     TYPE_MALLOW                         = 5,
+    TYPE_SLAUGHTER                      = 6,
 
     DATA_BARON_RUN_NONE                 = 0,
     DATA_BARON_RUN_GATE                 = 1,
@@ -70,11 +71,11 @@ enum MiscIds
 {
     SAY_BLACK_GUARD_INIT                = 0,
     SAY_BARON_INIT_YELL                 = 0,
-    SAY_BRAON_ZIGGURAT_FALL_YELL        = 1,
+    SAY_BARON_ZIGGURAT_FALL_YELL        = 1,
     SAY_BARON_10M                       = 2,
     SAY_BARON_5M                        = 3,
     SAY_BARON_0M                        = 4,
-    SAY_BRAON_SUMMON_RAMSTEIN           = 5,
+    SAY_BARON_SUMMON_RAMSTEIN           = 5,
     SAY_BARON_GUARD_DEAD                = 6,
 
     EVENT_BARON_TIME                    = 1,
