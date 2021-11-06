@@ -31,6 +31,7 @@ enum DataTypes
     TYPE_BARON_FIGHT                    = 4,
     TYPE_MALLOW                         = 5,
     TYPE_SLAUGHTER                      = 6,
+    DATA_MAGISTRATE_BARTHILAS           = 7,
 
     DATA_BARON_RUN_NONE                 = 0,
     DATA_BARON_RUN_GATE                 = 1,
